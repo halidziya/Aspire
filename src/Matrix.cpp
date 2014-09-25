@@ -47,7 +47,7 @@ void Matrix::readMatrix(char* filename)
 	ifstream file(filename);
 	int i,j;
 	double val;
-	if (file==NULL)
+	if (!file.is_open())
 		printf("Could not operfile...\n");
 	else
 	{
@@ -208,9 +208,11 @@ void  Matrix::operator=(const Matrix& mat)
 
 
 
-Matrix::Matrix(Matrix&& mat)
+Matrix::Matrix(Matrix&& mat) : Vector(mat)
 {
-	Vector::Vector(mat);
+	triangle = mat.triangle;
+	m = mat.m;
+	r = mat.r;
 }
 
 Matrix::Matrix(const Matrix& mat) : Vector(mat) , r(mat.r) , m(mat.m) , triangle(mat.triangle)
