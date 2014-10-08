@@ -27,6 +27,6 @@ The last three arguments are optional and default values are 1000 100 and 1 resp
 
 Source code includes 3rd party files. These files indicated with appropriate comments. 
 munkres.m 
-plot_gaussian_ellipsoid.many
+plot_gaussian_ellipsoid.m
 utils.cpp
 utils.h
