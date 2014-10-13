@@ -1,0 +1,6 @@
+make[1]: Entering directory `/home/halidziya/Desktop/aspire_linux'
+g++ -pthread -std=c++  -O2 -frtti -fexceptions -fPIC -O -std=c++0x -D_REENTRANT -c  -o "aspire.o" aspire.cpp
+g++: error: unrecognized command line option ‘-std=c++’
+make[1]: *** [aspire.o] Error 1
+make[1]: Leaving directory `/home/halidziya/Desktop/aspire_linux'
+make: *** [ASPIRE] Error 2
