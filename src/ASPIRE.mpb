@@ -1,8 +1,0 @@
-// $Id: ASPIRE.mpb 
-
-project  {
-  specific (gnuace, make) {
-    compile_flags += -std=c++0x
-  }
-
-}
