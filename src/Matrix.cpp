@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <math.h>
+#include <string.h> 
 
 using namespace std;
 
@@ -80,7 +81,7 @@ void Matrix::writeMatrix(char* filename)
 void Matrix::readBin(char* filename)
 {
 	FILE* file;
-	fopen_s(&file,filename,"rb");
+	file=fopen(filename,"rb");
 	int i,j;
 	double val;
 	if (file==NULL)
@@ -101,7 +102,7 @@ void Matrix::readBin(char* filename)
 void Matrix::writeBin(char* filename)
 {
 	FILE* file;
-	fopen_s(&file,filename,"wb");
+	file=fopen(filename,"wb");
 	int i,j;
 	fwrite(&r,sizeof(int),1,file);
 	fwrite(&m,sizeof(int),1,file);
@@ -114,7 +115,7 @@ void Matrix::writeBin(char* filename)
 
 
 /* Get Row */
-Vector Matrix::operator()(int i){ 
+Vector& Matrix::operator()(int i){ 
 	absbuffer.get().data = data + m*i;
 	return absbuffer.next();
 }
@@ -161,7 +162,7 @@ Matrix Matrix::chol()
 }
 
 
-Matrix Matrix::operator*(double scalar)
+Matrix& Matrix::operator*(double scalar)
 {
 	int i;
 	Matrix& mati = matbuffer.get();
@@ -170,7 +171,7 @@ Matrix Matrix::operator*(double scalar)
 	return matbuffer.next();
 }
 
-Matrix Matrix::operator/(double scalar)
+Matrix& Matrix::operator/(double scalar)
 {
 	int i;
 	Matrix& mati = matbuffer.get();
@@ -180,7 +181,7 @@ Matrix Matrix::operator/(double scalar)
 	return matbuffer.next();
 }
 
-Matrix Matrix::operator+(Matrix& mat)
+Matrix& Matrix::operator+(Matrix& mat)
 {
 	int i;
 	Matrix& mati = matbuffer.get();
@@ -189,7 +190,7 @@ Matrix Matrix::operator+(Matrix& mat)
 	return matbuffer.next();
 }
 
-Matrix Matrix::operator-(Matrix& mat)
+Matrix& Matrix::operator-(Matrix& mat)
 {
 	int i;
 	Matrix& mati = matbuffer.get();

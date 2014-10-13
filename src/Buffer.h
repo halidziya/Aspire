@@ -1,5 +1,9 @@
 #pragma once
-#define thread_specific __declspec( thread )
+#ifdef _WIN32
+  #define thread_specific __declspec( thread )
+#elif defined(__linux)
+  #define thread_specific __thread
+#endif
 #include <vector>
 using namespace std;
 
@@ -65,7 +69,7 @@ template <class T>
 class MultiBuffer
 {
 public:
-	thread_specific static int threadid;
+	static thread_specific int threadid;
 	static int nthreads;
 	MultiBuffer(int nthreads,int buffersize,int dim,int real=2)
 	{
@@ -102,10 +106,10 @@ public:
 	~MultiBuffer(void){
 			
 	}
-	vector<Buffer<T>> data;
+	vector<Buffer<T> > data;
 };
 
 template <class T>
-int MultiBuffer<T>::threadid;
+thread_specific int MultiBuffer<T>::threadid;
 template <class T>
 int MultiBuffer<T>::nthreads;

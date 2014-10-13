@@ -24,7 +24,7 @@ public:
 	~Restaurant(void);
 	void run(int id);
 
-	void operator=(Restaurant& r);
+	void operator<<(Restaurant& r);
 	friend ostream& operator<<(ostream& os, Restaurant& v);
 };
 

@@ -18,7 +18,7 @@ Customer::~Customer(void)
 }
 
 
-void Customer::operator=(Customer& c)
+void Customer::operator<<(Customer& c)
 {
 	new (&data) Vector(c.data); // Do not copy actual vector 
 }

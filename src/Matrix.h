@@ -23,13 +23,13 @@ public:
 	void writeBin(char* filename);
 	
 
-	Vector operator()(int i);   // Get row
-	Matrix operator*(double scalar);
+	Vector& operator()(int i);   // Get row
+	Matrix& operator*(double scalar);
 	void   operator=(const Matrix& m);
-	Matrix operator+(Matrix& v);	// Summation
-	Matrix operator-(Matrix& v);	// Subtract
-	Matrix operator/(double scalar); // Scaling
-	Matrix operator<=(const Matrix& mat); //Point by Abstract Matrix
+	Matrix& operator+(Matrix& v);	// Summation
+	Matrix& operator-(Matrix& v);	// Subtract
+	Matrix& operator/(double scalar); // Scaling
+	Matrix& operator<=(const Matrix& mat); //Point by Abstract Matrix
 	void zero();
 	double sumlogdiag();
 	Matrix chol();

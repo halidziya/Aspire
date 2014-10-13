@@ -6,14 +6,16 @@ Restaurant::Restaurant(void)
 }
 
 
-void Restaurant::operator=(Restaurant& r)
+void Restaurant::operator<<(Restaurant& r)
 {
 	tables = r.tables;
-	customers = r.customers;
+        int i=0;
+        customers.resize(r.customers.size());
+        for (auto& a: r.customers)
+        { customers[i]=a; i++;}
 	Restaurantid = r.Restaurantid;
 	list<Table>::iterator it,tit;
 	vector<Customer>::iterator cit,rit;
-	int i;
 	for(it=tables.begin(),tit=r.tables.begin();tit!=r.tables.end();tit++,it++)
 	{
 		tit->copy = it;

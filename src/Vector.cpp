@@ -1,6 +1,7 @@
 #include "Vector.h"
 #include "Matrix.h"
 #include <new>
+#include <string.h>
 
 MultiBuffer<Vector> buffer;
 MultiBuffer<Vector> absbuffer(1,BUFF_SIZE,0,0);
@@ -53,7 +54,7 @@ double Vector::operator*(Vector& v) // Dot product
 	return res;
 }
 
-inline double& Vector::operator[](const int i){
+double& Vector::operator[](const int i){
 		return data[i];
 }
 
@@ -141,7 +142,7 @@ void Vector::resize(int size)
 
 /* Divide cholesky version */
 
-Vector Vector::operator/(Matrix& mat) // Be careful it modifies the original data
+Vector& Vector::operator/(Matrix& mat) // Be careful it modifies the original data
 {
 	int i,j;
 	Vector& v = buffer.get();
@@ -192,7 +193,7 @@ Vector Vector::unique()
 	return res;
 }
 
-Vector Vector::operator*(double scalar)
+Vector& Vector::operator*(double scalar)
 {
 	Vector& r = buffer.get();
 	for(int i=0;i<n;i++)
@@ -200,7 +201,7 @@ Vector Vector::operator*(double scalar)
 	return buffer.next();
 }
 
-Vector Vector::operator-(Vector& v)
+Vector& Vector::operator-(Vector& v)
 {
 	Vector& r = buffer.get();
 	for(int i=0;i<n;i++)
@@ -208,7 +209,7 @@ Vector Vector::operator-(Vector& v)
 	return buffer.next();
 }
 
-Vector Vector::operator+(Vector& v)
+Vector& Vector::operator+(Vector& v)
 {
 	Vector& r = buffer.get();
 	for(int i=0;i<n;i++)
@@ -217,7 +218,7 @@ Vector Vector::operator+(Vector& v)
 }
 
 
-Vector Vector::operator/(double scalar)
+Vector& Vector::operator/(double scalar)
 {
 	Vector& r = buffer.get();
 	double divval = 1.0/scalar;
@@ -227,7 +228,7 @@ Vector Vector::operator/(double scalar)
 }
 
 
-Matrix Vector::operator>>(Vector& v) // Outer product
+Matrix& Vector::operator>>(Vector& v) // Outer product
 {
 	int i,j,vn;
 	Matrix& mat = matbuffer.get();

@@ -39,16 +39,16 @@ public:
 	Vector unique();	// Returns unique values 
 
 
-	inline double& operator[](const int i);
+	double& operator[](const int i);
 	int		operator()(int i);	 // Return integer
 	double operator*(Vector& v); // Inner product
-	Vector operator-(Vector& v); // Subtraction
-	Vector operator/(Matrix& mat); // Cholesky matrix division
+	Vector& operator-(Vector& v); // Subtraction
+	Vector& operator/(Matrix& mat); // Cholesky matrix division
 	void operator=(const Vector& v); // Assignment 
-	Vector operator*(double scalar); // Scaling
-	Vector operator+(Vector& v);	// Summation
-	Vector operator/(double scalar); // Scaling
-	Matrix operator>>(Vector& v);	// Outer product
+	Vector& operator*(double scalar); // Scaling
+	Vector& operator+(Vector& v);	// Summation
+	Vector& operator/(double scalar); // Scaling
+	Matrix& operator>>(Vector& v);	// Outer product
 	double maximum();
 
 	friend ostream& operator<<(ostream& os, const Vector& v);

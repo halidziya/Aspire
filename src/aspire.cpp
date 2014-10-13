@@ -9,6 +9,7 @@
 #include "Customer.h"
 #include <thread>  
 #include <iostream>
+#include <string>
 
 
 using namespace std;
@@ -17,7 +18,7 @@ using namespace std;
 int MAX_SWEEP=100;
 int BURNIN=10;
 int SAMPLE= 10;// Default value is 10 sample + 1 post burnin
-char* result_dir = "./";
+string result_dir = "./";
 
 // Variables
 int d,n;
@@ -34,6 +35,7 @@ int main(int argc,char** argv)
 	char* configfile = argv[4];
 
 	srand(time(NULL));
+        
 	// Default values , 1000 , 100  , out
 	if (argc>5)
 		MAX_SWEEP = atoi(argv[5]);
@@ -47,6 +49,7 @@ int main(int argc,char** argv)
 	
 	step();
 					 // Computing buffer
+        
 	string ss(result_dir);
 	ofstream nsampleslog(ss.append("nsamples.log"));
 
@@ -119,7 +122,8 @@ int main(int argc,char** argv)
 	for(i=0;i<ds.n;i++)
 	{
 		g = Restaurantit[ds.labels(i)];
-		g->tables.begin()->addInitPoint(ds.data(i));
+                Vector& v= ds.data(i);
+		g->tables.begin()->addInitPoint(v);
 		g->customers.emplace_back(ds.data(i),loglik0[i],g->tables.begin());
 	}
 
@@ -128,12 +132,11 @@ int main(int argc,char** argv)
 		Restaurants[i].tables.front().calculateCov();
 		firstDish->addCluster(Restaurants[i].tables.front());
 	}
-
+        
 	step();
 	firstDish->calculateDist();
 	for (i=0;i<Restaurantids.n;i++)
 		Restaurants[i].tables.front().calculateDist();
-
 //END INITIALIZATION
 
 // GIBBS SAMPLER
@@ -226,7 +229,6 @@ int main(int argc,char** argv)
 					newdishprob += (*points)->loglik0;
 
 				maxdishprob = newdishprob;
-
 				for(dit=franchise.begin();dit!=franchise.end();dit++) 
 				{
 					logprob=0;
@@ -247,13 +249,13 @@ int main(int argc,char** argv)
 				{
 					dit->logprob = exp(dit->logprob - maxdishprob);
 					sumprob += dit->logprob;
+                                        
 				}
 
 				sumprob += exp(newdishprob - maxdishprob);
 
 				double rrr = urand();
 				val = rrr*sumprob;
-
 				for(dit=franchise.begin();dit!=franchise.end();dit++) 
 				{
 					if ((dit->logprob)>=val)
@@ -299,7 +301,9 @@ int main(int argc,char** argv)
 			bestdishes = franchise;
 			for (dit=franchise.begin(),ditc=bestdishes.begin();dit!=franchise.end();dit++,ditc++)
 				dit->copy = ditc ;
-			beststate = Restaurants;
+                        beststate.resize(Restaurants.size());
+                        for (i=0;i<Restaurants.size();i++)
+                                beststate[i] << Restaurants[i];
 		}
 
 		if  (((num_sweep-BURNIN)%SAMPLE)==0 && num_sweep >= BURNIN)
@@ -312,17 +316,20 @@ int main(int argc,char** argv)
 					sampledLabels((num_sweep-BURNIN)/SAMPLE)[j++] = cit->table->dishp->dishid;
 		}
 
-		printf("Iter %d nDish %d Score %.1f\n",num_sweep,franchise.size(),gibbs_score);
+		printf("Iter %d nDish %d Score %.1f\n",num_sweep,(int)franchise.size(),gibbs_score);
 		flush(cout);
 		// 2nd Loop
 	}
 	step();
-
+        
 
 	franchise = bestdishes;
 	for (dit=franchise.begin(),ditc=bestdishes.begin();dit!=franchise.end();dit++,ditc++)
 				ditc->copy = dit;
-	Restaurants = beststate;
+        
+        Restaurants.resize(beststate.size());
+        for (i=0;i<beststate.size();i++)
+            Restaurants[i] << beststate[i];
 	
 
 string s(result_dir);
@@ -337,7 +344,7 @@ ofstream labelsout( s.append("Labels.matrix"),ios::out | ios::binary);
 
 	//ofstream dishfile("Dish.dish",ios::out | ios::binary);
 	//ofstream restfile("Restaurant.rest",ios::out | ios::binary);
-
+        //======
 	int ndish = franchise.size();
 	int nrest = Restaurants.size();
 	dishfile.write((char*)& ndish,sizeof(int));
@@ -367,5 +374,5 @@ ofstream labelsout( s.append("Labels.matrix"),ios::out | ios::binary);
 	printf("--%d--\n",sampledLabels.r);
 	nsampleslog.close();
 
-
+        printf("Output is written into files...\n");
 }
