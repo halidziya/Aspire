@@ -30,3 +30,6 @@ munkres.m
 plot_gaussian_ellipsoid.m
 utils.cpp
 utils.h
+
+ASPIRE is released under the terms of the GNU General Public License as published by the Free Software Foundation without any warranty.
+
