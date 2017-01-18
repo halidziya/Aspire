@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
-#include "DebugUtils.h"
-#include "DataSet.h"
-#include "util.h"
+#include "GMMBase.h"
+#include "FastMat.h"
 #include "Dish.h"
 #include "Restaurant.h"
-#include "Customer.h"
+#include "Table.h"
 #include <thread>  
 #include <iostream>
 
@@ -20,8 +19,8 @@ int SAMPLE= 10;// Default value is 10 sample + 1 post burnin
 char* result_dir = "./";
 
 // Variables
-int d,n;
-double m,kep,eta;
+// Variables d,n,Psi,kappa0,kappa1 already defined in GMMBase and FastMat
+double kep,eta;
 
 
 PILL_DEBUG
@@ -51,28 +50,26 @@ int main(int argc,char** argv)
 	ofstream nsampleslog(ss.append("nsamples.log"));
 
 	printf("Reading...\n");
-	DataSet ds(datafile,labelfile,priorfile,configfile);
-	d = ds.d;
-	n = ds.n;
-	kep = ds.kappa*ds.kappai/(ds.kappa+ds.kappai);
-	eta = ds.m - d + 2;
+	DataSet ds(datafile,priorfile,configfile);
+	kep = kappa*kappa1/(kappa +kappa1);
+	eta = m - d + 2;
 
-	precomputeGammaLn(2*(n+d)+1);  // With 0.5 increments
+	precomputegamLn(2*(n+d)+1);  // With 0.5 increments
 	init_buffer(thread::hardware_concurrency(),d);	
 	
 	Vector priormean(d); 
-	
+	Vector labels(n);
 	Matrix priorvariance(d,d);
 	
-	Global::Psi = ds.prior;
+	Psi = ds.prior;
 	
-	Global::Psi.r = d; // Last row is shadowed
-	Global::Psi.n = d*d;
-	Global::mu0 =  ds.prior(ds.d).copy();
+	Psi.r = d; // Last row is shadowed
+	Psi.n = d*d;
+	mu0 =  ds.prior(d).copy();
 	
-	Global::eta = eta;
-	priorvariance = Global::Psi*((kep+1)/((kep)*eta));
-	priormean = Global::mu0;
+	eta = eta;
+	priorvariance = Psi*((kep+1)/((kep)*eta));
+	priormean = mu0;
 	
 	Stut stt(priormean,priorvariance,eta); 
 	Vector loglik0;
@@ -80,7 +77,7 @@ int main(int argc,char** argv)
 	Dish emptyDish(stt);
 	vector<Restaurant> Restaurants;
 	vector<Restaurant> beststate;
-	Matrix     sampledLabels((MAX_SWEEP-BURNIN)/SAMPLE + 1,ds.n);
+	Matrix     sampledLabels((MAX_SWEEP-BURNIN)/SAMPLE + 1,n);
 	vector<vector<Restaurant>::iterator> Restaurantit; // Hash table
 	// vector<Customer> customers;
 	list<Dish> franchise;
@@ -94,14 +91,14 @@ int main(int argc,char** argv)
 
 	step();
 	loglik0		= emptyDish.dist.likelihood(ds.data);
-	Vector Restaurantids	= ds.labels.unique();
+	Vector Restaurantids	= labels.unique();
 	Restaurantit.resize(Restaurantids.maximum()+1); // Hash table for fast access
 	Restaurants.resize(Restaurantids.n);
 	// customers.reserve(ds.n);
 	step();
 	
 	// One cluster for each object initially
-	franchise.push_back(Dish(ds.d));
+	franchise.push_back(Dish(d));
 	list<Dish>::iterator firstDish = franchise.begin();
 
 	// Create Restaurants
@@ -116,9 +113,9 @@ int main(int argc,char** argv)
 	
 	// Create customers
 	vector<Restaurant>::iterator g;
-	for(i=0;i<ds.n;i++)
+	for(i=0;i<n;i++)
 	{
-		g = Restaurantit[ds.labels(i)];
+		g = Restaurantit[labels(i)];
 		g->tables.begin()->addInitPoint(ds.data(i));
 		g->customers.emplace_back(ds.data(i),loglik0[i],g->tables.begin());
 	}
@@ -154,8 +151,8 @@ int main(int argc,char** argv)
 
 	double newdishprob,maxdishprob,sumprob,val,logprob,gibbs_score,best_score;
 	int kal=1;
-	gibbs_score = -my_infinity();
-	best_score = -my_infinity();
+	gibbs_score = -INFINITY;
+	best_score = -INFINITY;
 
 	Vector score(MAX_SWEEP+1);
 	for (int num_sweep = 0;num_sweep <= MAX_SWEEP ; num_sweep++)
@@ -221,7 +218,7 @@ int main(int argc,char** argv)
 				}
 
 				
-				newdishprob = tit->npoints * log(Global::gamma);
+				newdishprob = tit->npoints * log(gam);
 				for(points=intable.begin();points!=intable.end();points++)
 					newdishprob += (*points)->loglik0;
 

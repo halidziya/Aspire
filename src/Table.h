@@ -2,11 +2,11 @@
 #include "Stut.h"
 #include "Dish.h"
 #include <list>
-#include "Global.h"
+#include "GMMBase.h"
 
 using namespace std;
 
-class Table : public Global
+class Table 
 {
 public:
 	Stut dist;
